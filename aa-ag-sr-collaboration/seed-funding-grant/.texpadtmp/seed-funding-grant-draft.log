@@ -1,0 +1,316 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.8)  13 MAY 2025 12:19
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**seed-funding-grant-draft.tex
+(./seed-funding-grant-draft.tex
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2025/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2024/06/29 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count196
+\c@section=\count197
+\c@subsection=\count198
+\c@subsubsection=\count199
+\c@paragraph=\count266
+\c@subparagraph=\count267
+\c@figure=\count268
+\c@table=\count269
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen141
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks17
+) (/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+ (/usr/local/texlive/2025/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2024/12/12 v1.0g TeX engine tests
+))
+\Gm@cnth=\count270
+\Gm@cntv=\count271
+\c@Gm@tempcnt=\count272
+\Gm@bindingoffset=\dimen142
+\Gm@wd@mp=\dimen143
+\Gm@odd@mp=\dimen144
+\Gm@even@mp=\dimen145
+\Gm@layoutwidth=\dimen146
+\Gm@layoutheight=\dimen147
+\Gm@layouthoffset=\dimen148
+\Gm@layoutvoffset=\dimen149
+\Gm@dimlist=\toks18
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 106.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2024/04/13 v1.2c Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen150
+\Gin@req@width=\dimen151
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen152
+\lightrulewidth=\dimen153
+\cmidrulewidth=\dimen154
+\belowrulesep=\dimen155
+\belowbottomsep=\dimen156
+\aboverulesep=\dimen157
+\abovetopsep=\dimen158
+\cmidrulesep=\dimen159
+\cmidrulekern=\dimen160
+\defaultaddspace=\dimen161
+\@cmidla=\count273
+\@cmidlb=\count274
+\@aboverulesep=\dimen162
+\@belowrulesep=\dimen163
+\@thisruleclass=\count275
+\@lastruleclass=\count276
+\@thisrulewidth=\dimen164
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/wrapfig/wrapfig.sty
+\wrapoverhang=\dimen165
+\WF@size=\dimen166
+\c@WF@wrappedlines=\count277
+\WF@box=\box52
+\WF@everypar=\toks19
+Package: wrapfig 2003/01/31  v 3.6
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/titlesec/titlesec.sty
+Package: titlesec 2025/01/04 v2.17 Sectioning titles
+\ttl@box=\box53
+\beforetitleunit=\skip51
+\aftertitleunit=\skip52
+\ttl@plus=\dimen167
+\ttl@minus=\dimen168
+\ttl@toksa=\toks20
+\titlewidth=\dimen169
+\titlewidthlast=\dimen170
+\titlewidthfirst=\dimen171
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count278
+\l__pdf_internal_box=\box54
+) (/Users/shakilrafi/Library/CloudStorage/Box-Box/aa-ag-sr-collaboration/seed-funding-grant/.texpadtmp/seed-funding-grant-draft.aux)
+\openout1 = `seed-funding-grant-draft.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: <default>
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: 
+* h-part:(L,W,R)=(61.42993pt, 491.43513pt, 61.42993pt)
+* v-part:(T,H,B)=(61.42993pt, 672.11012pt, 61.42993pt)
+* \paperwidth=614.295pt
+* \paperheight=794.96999pt
+* \textwidth=491.43513pt
+* \textheight=672.11012pt
+* \oddsidemargin=-10.84006pt
+* \evensidemargin=-10.84006pt
+* \topmargin=-47.84006pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=10.0pt
+* \footskip=30.0pt
+* \marginparwidth=65.0pt
+* \marginparsep=11.0pt
+* \columnsep=10.0pt
+* \skip\footins=9.0pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+(/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count279
+\scratchdimen=\dimen172
+\scratchbox=\box55
+\nofMPsegments=\count280
+\nofMParguments=\count281
+\everyMPshowfont=\toks21
+\MPscratchCnt=\count282
+\MPscratchDim=\dimen173
+\MPnumerator=\count283
+\makeMPintoPDFobject=\count284
+\everyMPtoPDFconversion=\toks22
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
+))
+
+LaTeX Warning: Citation `noauthor_hitech_2011' on page 1 undefined on input line 21.
+
+
+LaTeX Warning: Citation `senathirajah_impact_2024' on page 1 undefined on input line 21.
+
+
+LaTeX Warning: Citation `di_paolo_harrison_influence_2022' on page 1 undefined on input line 21.
+
+
+LaTeX Warning: Citation `fischer_spatial_2010' on page 1 undefined on input line 21.
+
+
+LaTeX Warning: Citation `chesher_what_2013' on page 1 undefined on input line 21.
+
+
+LaTeX Warning: Citation `zhou_essays_2018' on page 1 undefined on input line 23.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--26
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--26
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 19--26
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 41--44
+
+ []
+
+<../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-4.png, id=1, 1349.04pt x 963.6pt>
+File: ../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-4.png Graphic file (type png)
+<use ../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-4.png>
+Package pdftex.def Info: ../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-4.png  used on input line 51.
+(pdftex.def)             Requested size: 258.00276pt x 184.27687pt.
+<../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-7.png, id=3, 1349.04pt x 963.6pt>
+File: ../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-7.png Graphic file (type png)
+<use ../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-7.png>
+Package pdftex.def Info: ../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-7.png  used on input line 51.
+(pdftex.def)             Requested size: 258.00276pt x 184.27687pt.
+
+
+[1
+
+{/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 56.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 56.
+
+Overfull \hbox (7.99232pt too wide) in paragraph at lines 56--69
+[]\OT1/cmr/m/n/10 The clus-ter-ing re-sults are backed up by $\OML/cmm/m/it/10 ^^Z$ \OT1/cmr/m/n/10 val-ues in-di-cat-ing spillover ef-fects for \OT1/cmtt/m/n/10 MORT[]30[]HF \OT1/cmr/m/n/10 but not for \OT1/cmtt/m/n/10 COMP[]HIP[]KNEE\OT1/cmr/m/n/10 .
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 56--69
+\OT1/cmr/m/n/10 ap-prox-i-mately $0\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 293$ with a high de-gree of sta-tis-ti-cal cer-tainty, all things be-ing equal.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 72--75
+
+ []
+
+<hospital-spillovers.png, id=14, 990.70125pt x 502.87875pt>
+File: hospital-spillovers.png Graphic file (type png)
+<use hospital-spillovers.png>
+Package pdftex.def Info: hospital-spillovers.png  used on input line 78.
+(pdftex.def)             Requested size: 346.75063pt x 176.0102pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 86--93
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 86--93
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 86--93
+
+ []
+
+
+
+[2{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc} <../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-4.png> <../data-folder/medicare-and-medicaid-metrics/quality-measure-2022/hospitals-10-2022/complications-and-deaths/complications-and-deaths_files/figure-html/unnamed-chunk-4-7.png>]
+Underfull \hbox (badness 10000) in paragraph at lines 97--100
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 109--112
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 115--120
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 115--120
+
+ []
+
+(/Users/shakilrafi/Library/CloudStorage/Box-Box/aa-ag-sr-collaboration/seed-funding-grant/.texpadtmp/seed-funding-grant-draft.bbl)
+
+[3 <./hospital-spillovers.png>] (/Users/shakilrafi/Library/CloudStorage/Box-Box/aa-ag-sr-collaboration/seed-funding-grant/.texpadtmp/seed-funding-grant-draft.aux)
+ ***********
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
+ ***********
+
+
+LaTeX Warning: There were undefined references.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 2359 strings out of 473190
+ 41766 string characters out of 5715801
+ 444833 words of memory out of 5000000
+ 25618 multiletter control sequences out of 15000+600000
+ 563048 words of font info for 50 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 57i,9n,65p,1038b,253s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
+Output written on /Users/shakilrafi/Library/CloudStorage/Box-Box/aa-ag-sr-collaboration/seed-funding-grant/.texpadtmp/seed-funding-grant-draft.pdf (3 pages, 892165 bytes).
+PDF statistics:
+ 62 PDF objects out of 1000 (max. 8388607)
+ 34 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+

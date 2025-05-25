@@ -1,0 +1,361 @@
+---
+title: "Outpatient Imaging Efficiency"
+author: "Shakil Rafi"
+format: html
+toc: true
+toc-depth: 4
+lightbox: true
+title-block-banner: true
+df-print: tibble
+comments:
+  hypothesis: true
+editor: visual
+---
+
+# State Level
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+state <- read_csv("outpatient-imaging-efficiency-state.csv") %>%
+  clean_names() %>%
+  select(state, measure_id, score) %>%
+  mutate(
+    state = str_to_lower(state),
+    score = as.numeric(score)
+  ) %>%
+  pivot_wider(
+    names_from = measure_id,
+    values_from = score
+  )
+
+```
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+# Two-letter to full state name mapping
+state_lookup <- tibble(
+  state = state.abb,
+  full_state = tolower(state.name)
+)
+
+df_clean <- read_csv("outpatient-imaging-efficiency-state.csv") %>%
+  clean_names() %>%
+  select(state, measure_id, score) %>%
+  left_join(state_lookup, by = c("state" = "state")) %>%
+  select(full_state, measure_id, score) %>%
+  rename(state = full_state) %>%
+  mutate(score = as.numeric(score)) %>%
+  pivot_wider(
+    names_from = measure_id,
+    values_from = score
+  )
+
+```
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+# State abbreviation to full name mapping
+state_lookup <- tibble(
+  state = state.abb,
+  full_state = tolower(state.name)
+)
+
+state <- read_csv("outpatient-imaging-efficiency-state.csv") %>%
+  clean_names() %>%
+  select(state, measure_id, score) %>%
+  left_join(state_lookup, by = c("state" = "state")) %>%
+  select(full_state, measure_id, score) %>%
+  rename(state = full_state) %>%
+  mutate(score = as.numeric(score)) %>%
+  filter(!is.na(state)) %>%
+  pivot_wider(
+    names_from = measure_id,
+    values_from = score
+  )
+
+```
+
+```{r}
+us_map <- map_data("state")
+
+# Merge the cleaned data
+map_df <- left_join(us_map, state, by = c("region" = "state"))
+
+# Identify all OP_* columns
+metrics <- names(df_clean)[-1]  # everything except 'state'
+
+# Loop through each metric and plot
+for (metric in metrics) {
+  print(
+    ggplot(map_df, aes(long, lat, group = group, fill = .data[[metric]])) +
+      geom_polygon(color = "white", size = 0.2) +
+      scale_fill_viridis_c(na.value = "grey80") +
+      coord_map("albers", lat0 = 39, lat1 = 45) +
+      labs(
+        title = paste("Choropleth of", metric),
+        fill = metric
+      ) +
+      theme_minimal()
+  )
+}
+```
+
+# Hospital Level
+
+## Spatial Heatmap![](images/clipboard-9133593.png)
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(viridis)
+library(maps)
+
+# 1. Load & clean
+df <- read_csv("geocoded_hospital.csv") %>%
+  clean_names() %>%
+  filter(!state %in% c("AK", "HI", "PR")) %>%  # Remove non-continental
+  filter(
+    between(lat, 24, 50),    # Continental US latitude range
+    between(lon, -125, -66)  # Continental US longitude range
+  )
+
+# 2. State borders
+states_map <- map_data("state")
+
+# 3. Get OP metric names
+metrics <- df %>% select(starts_with("op_")) %>% names()
+
+# 4. Loop and plot
+for (metric in metrics) {
+  ggplot() +
+    geom_polygon(data = states_map, aes(x = long, y = lat, group = group),
+                 fill = "white", color = "gray70", size = 0.3) +
+    
+    geom_point(data = df, aes(x = lon, y = lat, color = .data[[metric]]), size = 1.5) +
+    
+    scale_color_viridis_c(option = "plasma", na.value = "grey80") +
+    
+    coord_map("albers", lat0 = 39, lat1 = 45) +
+    
+    labs(title = paste("Spatial Heatmap of", metric), color = metric) +
+    
+    theme_void() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 14),
+      legend.position = "right"
+    ) -> p
+  
+  print(p)
+}
+
+```
+
+## Moran's I
+
+```{r}
+# install.packages(c("tidyverse","sf","spdep","janitor"))
+library(tidyverse)
+library(sf)
+library(spdep)
+library(janitor)
+
+# 1. Read & clean
+df <- read_csv("geocoded_hospital.csv") %>%
+  drop_na(lat, lon) %>%        # need real coords
+  clean_names()                # makes OP-10 → op_10 etc.
+
+# 2. Make an sf object and grab raw coords matrix
+sf_df <- st_as_sf(df, coords = c("lon","lat"), crs = 4326)
+coords <- st_coordinates(sf_df)
+
+# 3. Identify your OP metrics
+op_cols <- df %>% select(starts_with("op_")) %>% names()
+
+# 4. Loop & compute Moran’s I by rebuilding neighbours on non-NA points
+moran_results <- map_df(op_cols, function(m) {
+  vals <- sf_df[[m]]
+  keep <- which(!is.na(vals))
+  
+  if (length(keep) < 3) {
+    return(tibble(metric = m, I_stat = NA_real_, p_value = NA_real_))
+  }
+  
+  # Rebuild 5-NN just on the hospitals with data
+  coords_sub <- coords[keep, ]
+  nb_sub     <- knn2nb(knearneigh(coords_sub, k = 5))
+  lw_sub     <- nb2listw(nb_sub, style = "W", zero.policy = TRUE)
+  
+  mi <- moran.test(vals[keep], lw_sub, zero.policy = TRUE)
+  
+  tibble(
+    metric  = m,
+    I_stat  = unname(mi$estimate["Moran I statistic"]),
+    p_value = mi$p.value
+  )
+})
+
+print(moran_results)
+
+```
+
+```{r}
+moran_results
+```
+
+## SAR
+
+```{r}
+# install.packages(c("tidyverse","sf","spdep","spatialreg","janitor"))
+library(tidyverse)
+library(sf)
+library(spdep)
+library(spatialreg)
+library(janitor)
+
+# 1. Read & clean
+df <- read_csv("geocoded_hospital.csv") %>%
+  drop_na(lat, lon) %>%
+  clean_names()
+
+# 2. Convert to sf & extract coords
+sf_df  <- st_as_sf(df, coords = c("lon","lat"), crs = 4326)
+coords <- st_coordinates(sf_df)
+
+# 3. Find your OP metrics
+op_cols <- df %>% select(starts_with("op_")) %>% names()
+
+# 4. Loop with purrr, force every column to the right type
+sar_results <- map_dfr(op_cols, function(m) {
+  vals <- df[[m]]
+  keep <- which(!is.na(vals))
+  
+  # too few observations?
+  if (length(keep) < 10) {
+    return(tibble(
+      metric    = m,
+      rho       = NA_real_,
+      LR_stat   = NA_real_,
+      LR_df     = NA_real_,
+      LR_pvalue = NA_real_
+    ))
+  }
+  
+  # rebuild 5-NN on just the non-NA points
+  coords_sub <- coords[keep, ]
+  nb_sub     <- knearneigh(coords_sub, k = 5) %>% knn2nb()
+  lw_sub     <- nb2listw(nb_sub, style = "W", zero.policy = TRUE)
+  
+  # fit spatial‐lag model (intercept only)
+  sar_mod <- lagsarlm(
+    formula     = as.formula(paste(m, "~ 1")),
+    data        = df[keep, ],
+    listw       = lw_sub,
+    zero.policy = TRUE
+  )
+  sm <- summary(sar_mod)
+  
+  # extract & coerce to double
+  tibble(
+    metric    = m,
+    rho       = as.numeric(sm$rho),
+    LR_stat   = as.numeric(sm$LR1[1]),
+    LR_df     = as.numeric(sm$LR1[2]),
+    LR_pvalue = as.numeric(sm$LR1[3])
+  )
+})
+
+print(sar_results)
+
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(spdep)
+library(spatialreg)
+library(janitor)
+library(furrr)
+library(progressr)
+
+# 1. Read & clean
+df <- read_csv("geocoded_hospital.csv") %>%
+  drop_na(lat, lon) %>%
+  clean_names()
+
+# 2. Convert to sf & extract coords
+sf_df  <- st_as_sf(df, coords = c("lon", "lat"), crs = 4326)
+coords <- st_coordinates(sf_df)
+
+# 3. Extract OP metrics
+op_cols <- df %>% select(starts_with("op_")) %>% names()
+
+# 4. Set up parallel plan and progress bar
+plan(multisession, workers = parallel::detectCores() - 1)
+handlers(global = TRUE)
+handlers("progress")
+
+# 5. Counterfactual SAR loop with furrr
+with_progress({
+  p <- progressor(along = op_cols)
+  sar_results <- future_map_dfr(op_cols, function(m) {
+    p(message = m)
+
+    vals <- df[[m]]
+    keep <- which(!is.na(vals))
+
+    if (length(keep) < 10) {
+      return(tibble(
+        metric    = m,
+        rho       = NA_real_,
+        LR_stat   = NA_real_,
+        LR_df     = NA_real_,
+        LR_pvalue = NA_real_
+      ))
+    }
+
+    coords_sub <- coords[keep, ]
+    nb_sub     <- knearneigh(coords_sub, k = 5) %>% knn2nb()
+    lw_sub     <- nb2listw(nb_sub, style = "W", zero.policy = TRUE)
+
+    sar_mod <- tryCatch(
+      lagsarlm(
+        formula     = as.formula(paste(m, "~ 1")),
+        data        = df[keep, ],
+        listw       = lw_sub,
+        zero.policy = TRUE
+      ),
+      error = function(e) return(NULL)
+    )
+
+    if (is.null(sar_mod)) {
+      return(tibble(
+        metric    = m,
+        rho       = NA_real_,
+        LR_stat   = NA_real_,
+        LR_df     = NA_real_,
+        LR_pvalue = NA_real_
+      ))
+    }
+
+    sm <- summary(sar_mod)
+
+    tibble(
+      metric    = m,
+      rho       = as.numeric(sm$rho),
+      LR_stat   = as.numeric(sm$LR1[1]),
+      LR_df     = as.numeric(sm$LR1[2]),
+      LR_pvalue = as.numeric(sm$LR1[3])
+    )
+  }, .options = furrr_options(seed = TRUE))
+})
+
+print(sar_results)
+
+```

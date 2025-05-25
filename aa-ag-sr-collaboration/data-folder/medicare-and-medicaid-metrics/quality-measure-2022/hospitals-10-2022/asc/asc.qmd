@@ -1,0 +1,315 @@
+---
+title: "ASC"
+format: html
+editor: visual
+---
+
+# Read Data
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+read_csv("asc-facility.csv") |> clean_names() -> asc_facility
+read_csv("asc-state.csv") |> clean_names() -> asc_state
+read_csv("asc-national.csv") |> clean_names() -> asc_national
+```
+
+```{r}
+library(skimr)
+
+asc_facility |> skim()
+asc_state |> skim()
+asc_national |> skim()
+```
+
+# State Level
+
+```{r}
+library(tigris)
+library(sf)
+library(dplyr)
+
+options(tigris_class = "sf")  # Ensure tigris returns an sf object
+options(tigris_use_cache = TRUE)
+
+states_sf <- states(cb = TRUE, year = 2022) |>
+  st_transform(5070)
+```
+
+```{r}
+# Join on state abbreviation
+map_data <- states_sf %>%
+  left_join(asc_state, by = c("STUSPS" = "state"))
+
+```
+
+```{r}
+# Get all numeric columns
+numeric_cols <- map_data %>% 
+  st_drop_geometry() %>%  # drop sf geometry to examine data only
+  select(where(is.numeric)) %>% 
+  names()
+
+# Plot each column as a choropleth
+for (col in numeric_cols) {
+  ggplot(map_data) +
+    geom_sf(aes_string(fill = col), color = "white") +
+    scale_fill_viridis_c(option = "C", na.value = "grey80") +
+    labs(
+      title = paste("Choropleth of", col),
+      fill = col
+    ) +
+    theme_minimal() -> p
+  
+  print(p)
+}
+
+```
+
+# Facility Level
+
+```{r}
+library(tigris)
+library(sf)
+
+options(tigris_use_cache = TRUE)
+
+# Download ZIP Code Tabulation Areas (ZCTAs)
+zips_sf <- zctas(cb = TRUE, year = 2020)
+
+```
+
+```{r}
+library(stringr)
+
+# Ensure ZIP code is character padded to 5 digits
+df_facility <- asc_facility |>
+  mutate(zip_code = str_pad(as.character(as.integer(zip_code)), 5, pad = "0"))
+
+# Join with shapefile
+zip_joined <- zips_sf |>
+  rename(zip_code = ZCTA5CE20) |>
+  inner_join(df_facility, by = "zip_code")
+
+# Calculate centroids
+zip_centroids <- zip_joined |>
+  st_centroid()
+```
+
+```{r}
+library(spdep)
+zip_centroids <- zip_centroids |>
+  mutate(asc_11_rate = as.numeric(asc_11_rate))
+
+centroids_clean <- zip_centroids %>%
+  filter(!is.na(asc_11_rate))
+
+coords <- st_coordinates(centroids_clean)
+knn <- knearneigh(coords, k = 5)
+nb <- knn2nb(knn)
+lw <- nb2listw(nb, style = "W")
+
+moran.test(centroids_clean$asc_11_rate, lw)
+
+```
+
+```{r}
+library(dplyr)
+library(spdep)
+library(sf)
+
+# Step 1: Convert all asc_* columns to numeric safely
+zip_centroids <- zip_centroids %>%
+  mutate(across(starts_with("asc_"), ~ as.numeric(.)))
+
+# Step 2: Identify target columns
+asc_cols <- names(zip_centroids) %>% 
+  keep(~ str_starts(., "asc_"))
+
+# Step 3: Loop through each column and run Moran's I
+moran_results <- list()
+
+for (col in asc_cols) {
+  message("Processing ", col)
+
+  data_clean <- zip_centroids %>%
+    filter(!is.na(.data[[col]]))
+  
+  # Skip if fewer than 10 observations (avoid error)
+  if (nrow(data_clean) < 10) {
+    warning("Skipping ", col, ": too few non-NA values")
+    next
+  }
+
+  coords <- st_coordinates(data_clean)
+  knn <- knearneigh(coords, k = 5)
+  nb <- knn2nb(knn)
+  lw <- nb2listw(nb, style = "W")
+
+  test_result <- moran.test(data_clean[[col]], lw)
+
+  moran_results[[col]] <- list(
+    statistic = test_result$statistic,
+    p_value = test_result$p.value,
+    estimate = test_result$estimate["Moran I statistic"]
+  )
+}
+
+```
+
+```{r}
+moran_df <- tibble::tibble(
+  variable = names(moran_results),
+  morans_I = sapply(moran_results, function(x) x$estimate["Moran I statistic"]),
+  p_value = sapply(moran_results, function(x) x$p.value)
+)
+
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(moran_df, aes(x = reorder(variable, morans_I), y = morans_I)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+  labs(
+    title = "Moran's I for ASC Metrics",
+    x = "ASC Metric",
+    y = "Moran's I Statistic"
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
+```{r}
+library(tidyverse)
+ggplot(moran_df, aes(x = reorder(variable, morans_I), y = morans_I)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = paste0("p=", signif(p_value, 2))),
+            hjust = -0.1, size = 3.5) +
+  coord_flip() +
+  ylim(min(moran_df$morans_I), max(moran_df$morans_I) + 0.1) +
+  labs(
+    title = "Moran's I with p-values",
+    x = "ASC Metric",
+    y = "Moran's I"
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
+```{r}
+moran_df <- moran_df %>%
+  mutate(sig = p_value < 0.05)
+
+ggplot(moran_df, aes(x = reorder(variable, morans_I), y = morans_I, fill = sig)) +
+  geom_col() +
+  scale_fill_manual(values = c("gray70", "tomato"), labels = c("Not Significant", "Significant")) +
+  coord_flip() +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Moran's I (KNN-based) with Significance",
+    x = "ASC Metric",
+    y = "Moran's I",
+    fill = "Significance"
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
+```{r}
+library(sf)
+library(spdep)
+library(dplyr)
+library(purrr)
+library(spatialreg)
+
+# 1. Convert asc_* columns to numeric
+zip_centroids <- zip_centroids %>%
+  mutate(across(starts_with("asc_"), ~ as.numeric(.)))
+
+# 2. Identify asc columns
+asc_cols <- names(zip_centroids) %>%
+  keep(~ str_starts(., "asc_"))
+
+# 3. Prepare results container
+sar_results <- list()
+
+# 4. Loop through each asc column
+for (col in asc_cols) {
+  message("Fitting SAR for ", col)
+  
+  data_clean <- zip_centroids %>%
+    filter(!is.na(.data[[col]]))
+  
+  if (nrow(data_clean) < 10) {
+    warning("Skipping ", col, ": too few non-NA values")
+    next
+  }
+
+  coords <- st_coordinates(data_clean)
+  
+  # Build spatial weights (k-nearest neighbor)
+  knn <- knearneigh(coords, k = 5)
+  nb <- knn2nb(knn)
+  lw <- nb2listw(nb, style = "W")
+
+  # Fit SAR model: Y ~ 1
+  formula <- as.formula(paste(col, "~ 1"))
+  model <- tryCatch({
+    lagsarlm(formula, data = data_clean, listw = lw)
+  }, error = function(e) {
+    warning("Model failed for ", col, ": ", e$message)
+    return(NULL)
+  })
+  
+  if (!is.null(model)) {
+    sar_results[[col]] <- summary(model)
+  }
+}
+
+```
+
+```{r}
+# Assuming your SAR models are stored like this:
+# sar_results[["asc_9_rate"]] = summary(lagsarlm(...))
+
+rho_values <- tibble::tibble(
+  variable = names(sar_results),
+  rho = sapply(sar_results, function(x) x$rho),
+  p_value = sapply(sar_results, function(x) x$Wald1$p.value)
+)
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(rho_values, aes(x = reorder(variable, rho), y = rho)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "SAR ρ (rho) values for ASC Metrics",
+    x = "ASC Metric",
+    y = "Spatial Autoregressive Parameter (ρ)"
+  ) +
+  theme_minimal(base_size = 14)
+
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(rho_values, aes(x = reorder(variable, p_value), y = p_value)) +
+  geom_col(fill = "darkorange") +
+  geom_hline(yintercept = 0.05, linetype = "dashed", color = "red") +
+  coord_flip() +
+  labs(
+    title = "P-values of SAR ρ (rho) Estimates",
+    x = "ASC Metric",
+    y = "P-value"
+  ) +
+  theme_minimal(base_size = 14)
+
+```

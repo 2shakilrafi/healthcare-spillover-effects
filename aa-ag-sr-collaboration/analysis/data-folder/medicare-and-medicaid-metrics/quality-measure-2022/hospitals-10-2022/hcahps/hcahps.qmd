@@ -1,0 +1,264 @@
+---
+title: "ASC"
+format: html
+editor: visual
+---
+
+## Read Data
+
+```{r}
+library(tidyverse)
+facility <- read_csv("hcahps-hospital.csv")
+state <- read_csv("hcahps-state.csv")
+national <- read_csv("hcahps-state.csv")
+```
+
+## EDA
+
+```{r}
+facility |>
+  summarise(across(everything(), ~ sum(is.na(.))))
+
+state |>
+  summarise(across(everything(), ~ sum(is.na(.))))
+
+national |>
+  summarise(across(everything(), ~ sum(is.na(.))))
+
+
+```
+
+```{r}
+facility |>
+  count(`Facility Name`)
+```
+
+### Geographic Distribution
+
+```{r}
+library(tidyverse)
+library(maps)
+
+# Load data
+asc_data <- read_csv("asc-state.csv")
+
+# Convert state abbreviation to full name (lowercase for maps)
+asc_data <- asc_data |>
+  mutate(State_full = tolower(state.name[match(State, state.abb)]))
+
+# Clean and convert character columns to numeric with "num_" prefix
+asc_data_clean <- asc_data |>
+  mutate(across(where(is.character), ~na_if(., "N/A (5)"))) |>
+  mutate(across(where(is.character), ~na_if(., "N/A"))) |>
+  mutate(across(where(is.character), as.numeric, .names = "num_{.col}"))
+
+# Get numeric column names we just created
+numeric_cols <- names(asc_data_clean) |> 
+  str_subset("^num_")
+
+# Bring in map data
+us_map <- map_data("state")
+
+# Loop through each numeric column and plot
+for (colname in numeric_cols) {
+  cat("\n\n### Plotting:", colname, "###\n\n")
+  
+  plot_data <- us_map %>%
+    left_join(asc_data_clean, by = c("region" = "State_full"))
+  
+  p <- ggplot(plot_data, aes(x = long, y = lat, group = group)) +
+    geom_polygon(aes(fill = .data[[colname]]), color = "white") +
+    scale_fill_viridis_c(option = "plasma", na.value = "black") +
+    coord_fixed(1.3) +
+    theme_minimal() +
+    labs(
+      title = paste("Choropleth of", colname),
+      fill = colname,
+      caption = "Source: asc-state.csv"
+    )
+  
+  print(p)
+}
+
+```
+
+```{r}
+
+
+```
+
+```{r}
+library(tidyverse)
+library(tigris)
+library(sf)
+
+# Get ZIP code geometries (you can also load a shapefile instead)
+zip_shapes <- zctas(cb = TRUE, starts_with = "AR", year = '2020')  # Arkansas ZIPs, or use all
+
+# Join your facility data (must have ZIP code column)
+facility_data <- facility %>%
+  left_join(zip_shapes, by = c("ZIP Code" = "GEOID20")) %>%
+  st_as_sf()  # spatial dataframe
+
+```
+
+```{r}
+library(tigris)
+options(tigris_use_cache = TRUE)
+
+zip_shapes <- zctas(cb = TRUE, year = 2020)
+
+```
+
+```{r}
+facility_geo <- facility |>
+  left_join(zip_shapes, by = c("ZIP Code" = "ZCTA5CE20"))
+```
+
+```{r}
+facility_geo |> write_csv("facility-geo.csv")
+```
+
+## ASC-12
+
+```{r}
+data_centroids <- facility_geo %>% 
+  mutate(centroid = st_centroid(geometry)) %>% 
+  st_set_geometry("centroid")
+```
+
+```{r}
+library(spdep)
+library(tmap)
+coords <- st_coordinates(data_centroids)
+missing_rows <- which(is.na(coords[,1]) | is.na(coords[,2]))
+
+# Drop the NA centroids
+data_centroids <- data_centroids[-missing_rows, ]
+coords <- coords[-missing_rows, ]
+
+# Now rerun KNN safely
+knn <- knearneigh(coords, k = 5)
+nb <- knn2nb(knn)
+lw <- nb2listw(nb, style = "W")
+```
+
+```{r}
+data_centroids <- data_centroids %>%
+  mutate(`ASC-12 RSHV Rate` = as.numeric(`ASC-12 RSHV Rate`))
+
+data_centroids <- data_centroids %>%
+  filter(!is.na(`ASC-12 RSHV Rate`))
+
+moran_test <- moran.test(data_centroids$`ASC-12 RSHV Rate`, lw)
+print(moran_test)
+
+# 6. Run Local Moran's I
+local_moran <- localmoran(data_centroids$`ASC-12 RSHV Rate`, lw)
+```
+
+```{r}
+data_centroids <- data_centroids %>%
+  filter(!is.na(`ASC-12 RSHV Rate`)) %>%
+  mutate(`ASC-12 RSHV Rate` = as.numeric(`ASC-12 RSHV Rate`))
+
+# 2. Get coordinates
+coords <- st_coordinates(data_centroids)
+
+# 3. Rebuild neighbors and weights
+knn <- knearneigh(coords, k = 5)
+nb <- knn2nb(knn)
+lw <- nb2listw(nb, style = "W")
+
+# 4. Now Moran's I works because the input and weights match exactly
+moran_test <- moran.test(data_centroids$`ASC-12 RSHV Rate`, lw)
+print(moran_test)
+
+# 5. Local Moran's I
+local_moran <- localmoran(data_centroids$`ASC-12 RSHV Rate`, lw)
+print(local_moran)
+```
+
+```{r}
+data_centroids <- data_centroids %>%
+  filter(!is.na(`ASC-12 RSHV Rate`)) %>%
+  mutate(`ASC-12 RSHV Rate` = as.numeric(`ASC-12 RSHV Rate`))
+
+# 2. Get coordinates
+coords <- st_coordinates(data_centroids)
+
+# 3. Rebuild neighbors and weights
+knn <- knearneigh(coords, k = 5)
+nb <- knn2nb(knn)
+lw <- nb2listw(nb, style = "W")
+
+# 4. Now Moran's I works because the input and weights match exactly
+moran_test <- moran.test(data_centroids$`ASC-12 RSHV Rate`, lw)
+print(moran_test)
+
+# 5. Local Moran's I
+local_moran <- localmoran(data_centroids$`ASC-12 RSHV Rate`, lw)
+print(local_moran)
+```
+
+```{r}
+library(spatialreg)
+
+sar_model <- lagsarlm(`ASC-12 RSHV Rate` ~ 1, data = data_centroids, listw = lw)
+
+```
+
+```{r}
+summary(sar_model)
+```
+
+```{r}
+sem_model <- errorsarlm(`ASC-12 RSHV Rate` ~ 1, data = data_centroids, listw = lw)
+summary(sem_model)
+```
+
+## Geocoding
+
+```{r}
+library(tidyverse)
+library(tidygeocoder)
+
+# 1. Load your data
+data <- read_csv("asc-facility.csv")
+
+# 2. Try geocoding by Facility Name first
+data_name_geocoded <- data %>%
+  geocode(address = `Facility Name`, method = "osm", lat = lat_name, long = lon_name)
+
+# 3. Identify failed geocodings (lat/lon are NA)
+failed_name <- data_name_geocoded %>%
+  filter(is.na(lat_name) | is.na(lon_name))
+
+# 4. For failures, build city+state+zip fallback address
+failed_name <- failed_name %>%
+  mutate(fallback_address = paste(City, State, `ZIP Code`, sep = ", "))
+
+# 5. Geocode the fallback addresses
+failed_fallback_geocoded <- failed_name %>%
+  geocode(address = fallback_address, method = "osm", lat = lat_fallback, long = lon_fallback)
+
+# 6. Merge the successful name-based geocodes and the fallback
+# If name-based lat/lon are NA, use fallback lat/lon
+data_final <- data_name_geocoded %>%
+  left_join(failed_fallback_geocoded %>% select(`Facility Name`, lat_fallback, lon_fallback), by = "Facility Name") %>%
+  mutate(
+    latitude = if_else(is.na(lat_name), lat_fallback, lat_name),
+    longitude = if_else(is.na(lon_name), lon_fallback, lon_name)
+  )
+
+# 7. Clean up
+data_final <- data_final %>%
+  select(-lat_name, -lon_name, -lat_fallback, -lon_fallback)
+
+# 8. Save your geocoded file
+write_csv(data_final, "asc-facility-geocoded.csv")
+
+# 9. Check
+glimpse(data_final)
+
+```

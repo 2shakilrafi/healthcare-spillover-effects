@@ -1,0 +1,30 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+library(DBI)
+library(odbc)
+
+con <- dbConnect(odbc::odbc(),
+  .connection_string = 'Driver={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:/Users/sarafi/Box/aa-ag-sr-collaboration/data-folder/health-it-adoption/2017/2017-database.mdb')
+
+
+```
+
+```{r}
+# List only user-defined tables (filter out MSys* tables)
+tables <- dbListTables(con)
+tables <- tables[!grepl("^MSys", tables)]
+
+
+# Step 2: Loop through each table and write to CSV
+for (tbl in tables) {
+  data <- dbReadTable(con, tbl)
+  filename <- paste0("access-export-", tbl, ".csv")
+  write.csv(data, file = filename, row.names = FALSE)
+}
+
+```
