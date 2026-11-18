@@ -11,7 +11,7 @@ The project notes identify several candidate methods for spatial exploration and
 - instrumental-variable and two-stage least-squares designs; and
 - exploratory spatiotemporal graph-attention models.
 
-These are research directions rather than a claim that every method is implemented in the current code. They answer different questions and rely on different assumptions. Spatial association alone is not evidence of a causal spillover effect; causal claims require a defensible design, validated instruments, sensitivity analysis, and careful treatment of interference.
+None of these is fully implemented in the current code yet. They answer different questions and rely on different assumptions. Spatial association alone is not evidence of a causal spillover effect; causal claims require a defensible design, validated instruments, sensitivity analysis, and careful treatment of interference.
 
 ## Repository map
 
@@ -33,6 +33,6 @@ This repository is an active research archive, not yet an installable package. T
 
 Large tabular files are tracked with Git LFS. Run `git lfs pull` after cloning when those files are needed.
 
-## Data responsibility
+## Data use
 
-Only use data for which you have the necessary permission. Confirm de-identification, redistribution rights, and institutional requirements before adding or sharing healthcare data.
+Only use data you have permission to use. Confirm de-identification, redistribution rights, and institutional requirements before adding or sharing healthcare data.
